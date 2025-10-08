@@ -1,0 +1,246 @@
+---
+# ansible/bootstrap.yml
+# Run with: ansible-playbook -i localhost, bootstrap.yml -c local --ask-become-pass
+# Designed for Debian/Ubuntu family. See notes below for other distros.
+
+- name: Bootstrap machine playbook (Debian/Ubuntu)
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+
+  vars:
+    # local repo layout - default assumes playbook is inside repo/ansible/
+    dotfiles_root: "{{ playbook_dir | dirname }}"   # one level up from ansible/
+    dotfiles_user: "{{ lookup('env','SUDO_USER') | default(lookup('env','USER')) }}"
+    user_home: "{{ (ansible_env.HOME if dotfiles_user == lookup('env','USER') else (ansible_env.HOME | default('/home/' ~ dotfiles_user))) }}"
+    # Debian package list (adjust names for other distros)
+    apt_packages:
+      - fastfetch
+      - emacs
+      - vlc
+      - zsh
+      - git
+      - git-email
+      - nmap
+      - cmake
+      - clang
+      - clang-format
+      - build-essential
+      - gcc
+      - g++
+      - coreutils
+      - libncurses-dev
+      - dwarves
+      - firefox
+      - ocaml
+      - opam
+
+    # packages that need special handling (linux-headers will be installed dynamically)
+    ensure_linux_headers: true
+
+    # zsh/oh-my-zsh
+    oh_my_zsh_repo: "https://github.com/ohmyzsh/ohmyzsh.git"
+    oh_my_zsh_dest: "{{ user_home }}/.oh-my-zsh"
+    oh_my_zsh_custom_themes_src: "{{ dotfiles_root }}/zsh/themes"
+    oh_my_zsh_custom_themes_dest: "{{ oh_my_zsh_dest }}/custom/themes"
+
+    # ghcup
+    ghcup_bin: "{{ user_home }}/.ghcup/bin/ghcup"
+    ghcup_install_script: "https://get-ghcup.haskell.org"
+
+    # for idempotent commands use `creates` where appropriate
+    shell_env:
+      HOME: "{{ user_home }}"
+
+  tasks:
+
+    - name: Sanity - ensure dotfiles user exists on the system
+      ansible.builtin.user:
+        name: "{{ dotfiles_user }}"
+      become: false
+      when: dotfiles_user is defined
+
+    - name: Update apt cache (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install apt packages (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: "{{ apt_packages }}"
+        state: present
+        install_recommends: no
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install linux-headers for current kernel (Debian)
+      ansible.builtin.shell: |
+        apt-get update -y
+        apt-get install -y "linux-headers-$(uname -r)"
+      args:
+        creates: "/lib/modules/$(uname -r)/build"
+      when:
+        - ansible_facts['os_family'] == "Debian"
+        - ensure_linux_headers
+
+    - name: Ensure zsh is the user's shell (optional)
+      ansible.builtin.user:
+        name: "{{ dotfiles_user }}"
+        shell: /usr/bin/zsh
+      when: "'/usr/bin/zsh' in ansible_facts['shells']"
+
+    - name: Install oh-my-zsh (clone) if missing
+      ansible.builtin.git:
+        repo: "{{ oh_my_zsh_repo }}"
+        dest: "{{ oh_my_zsh_dest }}"
+        version: master
+        update: yes
+        force: no
+        accept_hostkey: yes
+      become: false
+      environment: "{{ shell_env }}"
+      when: not lookup('fileglob', oh_my_zsh_dest + '/.git', errors='ignore')
+
+    - name: Ensure custom zsh themes folder exists in oh-my-zsh
+      ansible.builtin.file:
+        path: "{{ oh_my_zsh_custom_themes_dest }}"
+        state: directory
+        owner: "{{ dotfiles_user }}"
+        mode: '0755'
+      become: false
+
+    - name: Copy custom zsh themes from repo (if present)
+      ansible.builtin.copy:
+        src: "{{ oh_my_zsh_custom_themes_src }}/"
+        dest: "{{ oh_my_zsh_custom_themes_dest }}/"
+        owner: "{{ dotfiles_user }}"
+        mode: '0644'
+      when: ansible.builtin.stat(path=oh_my_zsh_custom_themes_src).stat.exists
+      become: false
+
+    - name: Backup existing dotfiles if present (create .dotfiles-backup with timestamp)
+      ansible.builtin.shell: |
+        mkdir -p "{{ user_home }}/.dotfiles-backup"
+        ts=$(date +%Y%m%d%H%M%S)
+        for f in .emacs .zshrc .zsh_profile; do
+          if [ -e "{{ user_home }}/$f" ] && [ ! -L "{{ user_home }}/$f" ]; then
+            mv "{{ user_home }}/$f" "{{ user_home }}/.dotfiles-backup/${f}.$ts" || true
+          fi
+        done
+      args:
+        executable: /bin/bash
+      become: false
+
+    - name: Deploy .emacs if present in repo
+      ansible.builtin.copy:
+        src: "{{ dotfiles_root }}/emacs/.emacs"
+        dest: "{{ user_home }}/.emacs"
+        owner: "{{ dotfiles_user }}"
+        mode: '0644'
+        backup: yes
+      when: ansible.builtin.stat(path=dotfiles_root + '/emacs/.emacs').stat.exists
+      become: false
+
+    - name: Deploy .zshrc if present in repo
+      ansible.builtin.copy:
+        src: "{{ dotfiles_root }}/zsh/.zshrc"
+        dest: "{{ user_home }}/.zshrc"
+        owner: "{{ dotfiles_user }}"
+        mode: '0644'
+        backup: yes
+      when: ansible.builtin.stat(path=dotfiles_root + '/.zshrc').stat.exists
+      become: false
+
+    - name: Deploy .zsh_profile if present in repo
+      ansible.builtin.copy:
+        src: "{{ dotfiles_root }}/.zsh_profile"
+        dest: "{{ user_home }}/.zsh_profile"
+        owner: "{{ dotfiles_user }}"
+        mode: '0644'
+        backup: yes
+      when: ansible.builtin.stat(path=dotfiles_root + '/.zsh_profile').stat.exists
+      become: false
+
+    - name: Ensure ghcup is installed (idempotent)
+      ansible.builtin.stat:
+        path: "{{ ghcup_bin }}"
+      register: ghcup_stat
+      become: false
+
+    - name: Install ghcup using upstream installer (if missing)
+      ansible.builtin.shell: |
+        set -euo pipefail
+        curl --proto '=https' --tlsv1.2 -sSf {{ ghcup_install_script }} | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh -s -- -y
+      args:
+        creates: "{{ ghcup_bin }}"
+        executable: /bin/bash
+      environment:
+        HOME: "{{ user_home }}"
+      become: false
+      when: not ghcup_stat.stat.exists
+
+    - name: Ensure ghcup is on the user's PATH via ~/.profile (simple, idempotent)
+      ansible.builtin.lineinfile:
+        path: "{{ user_home }}/.profile"
+        regexp: '(^export PATH=.*\\.ghcup)'
+        line: 'export PATH="$HOME/.ghcup/bin:$HOME/.cabal/bin:$HOME/.local/bin:$PATH"'
+        create: yes
+        state: present
+        owner: "{{ dotfiles_user }}"
+      become: false
+
+    - name: Ensure cabal/ghc/hls/stack installed via ghcup (idempotent)
+      ansible.builtin.shell: |
+        set -e
+        export HOME="{{ user_home }}"
+        export PATH="$HOME/.ghcup/bin:$HOME/.cabal/bin:$HOME/.local/bin:$PATH"
+        # install ghc (latest recommended) if not present
+        if ! command -v ghc >/dev/null 2>&1; then
+          ghcup install ghc recommended
+          ghcup set ghc recommended || true
+        fi
+        # install cabal if missing
+        if ! command -v cabal >/dev/null 2>&1; then
+          ghcup install cabal
+          ghcup set cabal latest || true
+        fi
+        # install haskell-language-server if missing
+        if ! command -v hls >/dev/null 2>&1; then
+          ghcup install hls
+        fi
+        # install stack if missing
+        if ! command -v stack >/dev/null 2>&1; then
+          ghcup install stack
+        fi
+      args:
+        creates: "{{ user_home }}/.ghcup/bin/ghc"
+        executable: /bin/bash
+      become: false
+
+    - name: Ensure opam is initialized (idempotent)
+      ansible.builtin.stat:
+        path: "{{ user_home }}/.opam"
+      register: opam_stat
+      become: false
+
+    - name: Initialize opam if not initialized
+      ansible.builtin.shell: |
+        set -e
+        export HOME="{{ user_home }}"
+        eval "$(opam init -y --disable-sandboxing --bare || true)"
+      args:
+        creates: "{{ user_home }}/.opam"
+        executable: /bin/bash
+      become: false
+      when: not opam_stat.stat.exists
+
+    - name: Ensure ownership of deployed files
+      ansible.builtin.file:
+        path: "{{ user_home }}"
+        state: directory
+        recurse: yes
+        owner: "{{ dotfiles_user }}"
+      become: false
+
+  # end tasks
+  
