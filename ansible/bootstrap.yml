@@ -149,7 +149,6 @@
         owner: "{{ dotfiles_user }}"
         mode: '0644'
         backup: yes
-      when: ansible.builtin.stat(path=dotfiles_root + '/emacs/.emacs').stat.exists
       become: false
 
     - name: Deploy .zshrc if present in repo
