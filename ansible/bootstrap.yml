@@ -168,6 +168,7 @@
         mode: '0644'
         backup: yes
       become: false
+      ignore_errors: true
 
     - name: Ensure ghcup is installed (idempotent)
       ansible.builtin.stat:
