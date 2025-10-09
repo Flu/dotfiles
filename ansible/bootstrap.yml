@@ -162,7 +162,7 @@
 
     - name: Deploy .zsh_profile if present in repo
       ansible.builtin.copy:
-        src: "{{ dotfiles_root }}/.zsh_profile"
+        src: "{{ dotfiles_root }}/zsh/.zsh_profile"
         dest: "{{ user_home }}/.zsh_profile"
         owner: "{{ dotfiles_user }}"
         mode: '0644'
