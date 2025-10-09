@@ -83,11 +83,42 @@
         - ansible_facts['os_family'] == "Debian"
         - ensure_linux_headers
 
-    - name: Ensure zsh is the user's shell (optional)
+    - name: Ensure zsh is installed
+      become: yes
+      ansible.builtin.package:
+        name: zsh
+        state: present
+
+    - name: Check current default shell
+      ansible.builtin.command: echo $SHELL
+      register: current_shell
+      changed_when: false
+
+    - name: Change default shell to zsh if not already
+      become: yes
       ansible.builtin.user:
-        name: "{{ dotfiles_user }}"
+        name: "{{ ansible_user_id }}"
         shell: /usr/bin/zsh
-      when: "'/usr/bin/zsh' in ansible_facts['shells']"
+      when: current_shell.stdout != "/usr/bin/zsh"
+
+    - name: Ensure Oh My Zsh is installed
+      ansible.builtin.git:
+        repo: "https://github.com/ohmyzsh/ohmyzsh.git"
+        dest: "{{ ansible_env.HOME }}/.oh-my-zsh"
+        update: no
+
+    - name: Copy .zshrc and custom theme
+      ansible.builtin.copy:
+        src: "zsh/.zshrc"
+        dest: "{{ ansible_env.HOME }}/.zshrc"
+        mode: '0644'
+
+    - name: Copy custom Zsh themes
+      ansible.builtin.copy:
+      src: "zsh/themes/"
+      dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/"
+      mode: '0644'
+      recursive: yes
 
     - name: Install oh-my-zsh (clone) if missing
       ansible.builtin.git:
