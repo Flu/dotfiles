@@ -158,7 +158,6 @@
         owner: "{{ dotfiles_user }}"
         mode: '0644'
         backup: yes
-      when: ansible.builtin.stat(path=dotfiles_root + '/.zshrc').stat.exists
       become: false
 
     - name: Deploy .zsh_profile if present in repo
@@ -168,7 +167,6 @@
         owner: "{{ dotfiles_user }}"
         mode: '0644'
         backup: yes
-      when: ansible.builtin.stat(path=dotfiles_root + '/.zsh_profile').stat.exists
       become: false
 
     - name: Ensure ghcup is installed (idempotent)
