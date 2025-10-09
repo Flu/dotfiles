@@ -127,7 +127,6 @@
         dest: "{{ oh_my_zsh_custom_themes_dest }}/"
         owner: "{{ dotfiles_user }}"
         mode: '0644'
-      when: ansible.builtin.stat(path=oh_my_zsh_custom_themes_src).stat.exists
       become: false
 
     - name: Backup existing dotfiles if present (create .dotfiles-backup with timestamp)
