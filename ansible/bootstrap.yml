@@ -153,7 +153,7 @@
 
     - name: Deploy .zshrc if present in repo
       ansible.builtin.copy:
-        src: "{{ dotfiles_root }}/.zshrc"
+        src: "{{ dotfiles_root }}/zsh/.zshrc"
         dest: "{{ user_home }}/.zshrc"
         owner: "{{ dotfiles_user }}"
         mode: '0644'
