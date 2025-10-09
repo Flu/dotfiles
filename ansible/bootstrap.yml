@@ -18,6 +18,7 @@
     apt_packages:
       - fastfetch
       - emacs
+      - curl
       - vlc
       - zsh
       - git
