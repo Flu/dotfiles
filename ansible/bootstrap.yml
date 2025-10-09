@@ -115,10 +115,10 @@
 
     - name: Copy custom Zsh themes
       ansible.builtin.copy:
-      src: "zsh/themes/"
-      dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/"
-      mode: '0644'
-      recursive: yes
+        src: "zsh/themes/"
+        dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/"
+        mode: '0644'
+        recursive: yes
 
     - name: Install oh-my-zsh (clone) if missing
       ansible.builtin.git:
