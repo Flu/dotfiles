@@ -16,6 +16,7 @@
     user_home: "{{ (ansible_env.HOME if dotfiles_user == lookup('env','USER') else (ansible_env.HOME | default('/home/' ~ dotfiles_user))) }}"
     # Debian package list (adjust names for other distros)
     apt_packages:
+      - fastfetch
       - emacs
       - vlc
       - zsh
@@ -37,12 +38,6 @@
 
     # packages that need special handling (linux-headers will be installed dynamically)
     ensure_linux_headers: true
-
-    # Emacs packages to ensure (example). Modify to include the packages your .emacs expects.
-    emacs_packages:
-      - use-package
-      - magit
-      - company
 
     # zsh/oh-my-zsh
     oh_my_zsh_repo: "https://github.com/ohmyzsh/ohmyzsh.git"
@@ -88,11 +83,23 @@
         - ansible_facts['os_family'] == "Debian"
         - ensure_linux_headers
 
-    - name: Ensure zsh is the user's shell (optional)
+    - name: Ensure zsh is installed
+      become: yes
+      ansible.builtin.package:
+          name: zsh
+          state: present
+
+    - name: Check current default shell
+      ansible.builtin.command: echo $SHELL
+      register: current_shell
+      changed_when: false
+
+    - name: Change default shell to zsh if not already
+      become: yes
       ansible.builtin.user:
-        name: "{{ dotfiles_user }}"
+        name: "{{ ansible_user_id }}"
         shell: /usr/bin/zsh
-      when: "'/usr/bin/zsh' in ansible_facts['shells']"
+      when: current_shell.stdout != "/usr/bin/zsh"
 
     - name: Install oh-my-zsh (clone) if missing
       ansible.builtin.git:
