@@ -12,7 +12,6 @@
     xserver.enable = false;
     #displayManager.sddm.enable = true;
     #displayManager.sddm.wayland.enable = true;
-    displayManager.greetd.enable = true;
   };
 
   programs.hyprland = {
@@ -23,11 +22,41 @@
   programs.waybar.enable = true;
 
   environment.systemPackages = with pkgs; [
-    kitty
+    hyprpaper
+    alacritty
+    dolphin
     waybar
-    rofi
-    grim
-    slurp
-    wl-clipboard
+    rofi-wayland
+    grim slurp wl-clipboard
+    brightnessctl
+    playerctl
+    pavucontrol
   ];
+
+  # Home Manager for user-level config files
+  home-manager.users.flu = {
+    home.stateVersion = "25.05";
+
+    # Hyprland config
+    home.file.".config/hypr/hyprland.conf".source = ./hyprland/hyprland.conf;
+
+    # Waybar config
+    home.file.".config/waybar/config".source = ./hyprland/waybar/config;
+
+    # Rofi config
+    home.file.".config/rofi/config.rasi".source = ./hyprland/rofi/config.rasi;
+  };
+
+  # Enable polkit agent (needed for GUI apps like pavucontrol)
+  security.polkit.enable = true;
+  services.dbus.enable = true;
+
+  # PipeWire sound
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+  security.rtkit.enable = true;
 }
