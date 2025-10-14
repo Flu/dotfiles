@@ -24,9 +24,10 @@
   environment.systemPackages = with pkgs; [
     hyprpaper
     alacritty
-    dolphin
+    kitty
+    kdePackages.dolphin
     waybar
-    rofi-wayland
+    rofi
     grim slurp wl-clipboard
     brightnessctl
     playerctl
