@@ -27,8 +27,8 @@
 	      company-ghci company-irony company-irony-c-headers
 	      dired-git flycheck flycheck-clang-analyzer haskell-mode
 	      highlight-indent-guides highlight-indentation irony
-	      irony-eldoc lsp-haskell lsp-mode md4rd nlinum peep-dired
-	      ultra-scroll))
+	      irony-eldoc lsp-haskell lsp-mode nix-mode nlinum peep-dired
+	      ultra-scroll magit vertico doom-modeline))
  '(term-buffer-maximum-size 1024))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -47,6 +47,10 @@
       (package-install pkg))))
 
 ;; ----------- base ---------------
+(require 'doom-modeline)
+(setq doom-modeline-buffer-file-name-style 'truncate-except-project)
+(doom-modeline-mode)
+
 (setq catppuccin-flavor 'mocha) ; or 'latte, 'macchiato, or 'mocha
 (load-theme 'catppuccin t)
 
@@ -54,6 +58,27 @@
 (tool-bar-mode -1)
 
 (setq column-number-mode t)
+
+(scroll-bar-mode -1)
+(add-hook 'prog-mode-hook #'subword-mode)
+
+;; Stop creating backup and autosave files.
+(setq make-backup-files nil
+      auto-save-default nil)
+
+;; Accept 'y' and 'n' rather than 'yes' and 'no'.
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; I typically want to use UTF-8.
+(prefer-coding-system 'utf-8)
+
+;; Enable highlighting of current line.
+(global-hl-line-mode 1)
+
+;; Improved handling of clipboard in GNU/Linux and otherwise.
+(setq select-enable-clipboard t
+      select-enable-primary t
+      save-interprogram-paste-before-kill t)
 
 ;; ---------- irony-mode ----------
 ;; Enable irony-mode automatically for C/C++/ObjC
@@ -144,9 +169,6 @@ With no arg, N defaults to current line."
 ;; ------------- chronos --------------
 (require 'chronos)
 
-;; ------------- reddit ---------------
-(setq md4rd-subs-active '(emacs askscience assholedesign archlinux C_Programming ChoosingBeggars community conlangs Cplusplus cpp csharp dataisbeautiful dating_advice embedded enschede Esperanto europe history homelab iamverysmart interestingasfuck InternetIsBeautiful IsItBullshit itsaunixsystem javascript languagelearning latin learndutch linux linuxmasterrace linuxquestions lisp LispMemes MaliciousCompliance mildlycarcinogenic mildlyinteresting movies opensource Physics ProgrammerHumor programming Romania rust science sex ShitAmericansSay theydidthemath))
-
 ;; ------- kernel coding style --------
 (setq c-default-style "linux")
 
@@ -181,6 +203,13 @@ With no arg, N defaults to current line."
 
 ;; ---------- dired-git ----------------
 (add-hook 'dired-mode-hook 'dired-git-mode)
+
+;; -------------- magit ---------------
+(require 'magit)
+
+;; ------------ vertico ---------------
+(require 'vertico)
+(vertico-mode 1)
 
 (provide '.emacs)
 ;;; .emacs ends here
