@@ -57,7 +57,7 @@
 
     # Waybar configs
     home.file.".config/waybar/config".source = ./hyprland/waybar/config;
-    home.file.".config/wayba/style.css".source = ./hyprland/waybar/style.css;
+    home.file.".config/waybar/style.css".source = ./hyprland/waybar/style.css;
 
     # Rofi config
     home.file.".config/rofi/config.rasi".source = ./hyprland/rofi/config.rasi;
