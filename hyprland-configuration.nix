@@ -37,12 +37,12 @@
     alacritty
     kitty
     kdePackages.dolphin
-    waybar
     rofi
     grim slurp wl-clipboard
     brightnessctl
     playerctl
     pavucontrol
+    inputs.ashell.defaultPackage.${pkgs.system}
   ];
 
   # Home Manager for user-level config files
@@ -58,6 +58,9 @@
     # Waybar configs
     home.file.".config/waybar/config".source = ./hyprland/waybar/config;
     home.file.".config/waybar/style.css".source = ./hyprland/waybar/style.css;
+
+    # Ashell config
+    home.file.".config/ashell/config.toml".source = ./hyprland/ashell/config.toml;
 
     # Rofi config
     home.file.".config/rofi/config.rasi".source = ./hyprland/rofi/config.rasi;

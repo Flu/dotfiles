@@ -8,6 +8,7 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    ashell.url = "github:MalpenZibo/ashell";
   };
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs:

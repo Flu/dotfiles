@@ -4,7 +4,7 @@
     "height": 35,
     "spacing": 4,
     "margin-top": 5,
-    "margin-bottom": 10,
+    "margin-bottom": 5,
 
     // Choose the order of the modules
     "modules-center": ["idle_inhibitor", "custom/media", "pulseaudio", "network", "cpu", "memory", "temperature", "backlight", "keyboard-state", "sway/language", "battery", "battery#bat2",  "tray", "clock"],
