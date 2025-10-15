@@ -19,6 +19,17 @@
     xwayland.enable = true;
   };
 
+  # Use greetd as a secure, lightweight display manager
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --cmd Hyprland";
+        user = "greeter";
+      };
+    };
+  };
+
   programs.waybar.enable = true;
 
   environment.systemPackages = with pkgs; [
@@ -40,6 +51,9 @@
 
     # Hyprland config
     home.file.".config/hypr/hyprland.conf".source = ./hyprland/hyprland.conf;
+
+    # Hyprpaper
+    home.file.".config/hypr/hyprpaper.conf".source = ./hyprland/hyprpaper.conf;
 
     # Waybar config
     home.file.".config/waybar/config".source = ./hyprland/waybar/config;
