@@ -69,6 +69,7 @@
     wget
     curl
     git
+    btop
     vlc
     alacritty
     python313

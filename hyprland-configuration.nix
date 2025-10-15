@@ -24,7 +24,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --cmd Hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --cmd Hyprland";
         user = "greeter";
       };
     };
@@ -55,8 +55,9 @@
     # Hyprpaper
     home.file.".config/hypr/hyprpaper.conf".source = ./hyprland/hyprpaper.conf;
 
-    # Waybar config
+    # Waybar configs
     home.file.".config/waybar/config".source = ./hyprland/waybar/config;
+    home.file.".config/wayba/style.css".source = ./hyprland/waybar/style.css;
 
     # Rofi config
     home.file.".config/rofi/config.rasi".source = ./hyprland/rofi/config.rasi;
