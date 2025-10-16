@@ -1,8 +1,5 @@
 { config, pkgs, ... }:
 
-let
-  flu-linux = import ./modules/flu-linux.nix { inherit pkgs; };
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -10,9 +7,6 @@ in
     ./modules/zsh.nix
     ./modules/emacs.nix
   ];
-
-  # Custom kernel
-  boot.kernelPackages = flu-linux.kernelPackages;
 
   services = {
     xserver.enable = false;

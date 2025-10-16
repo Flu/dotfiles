@@ -8,10 +8,10 @@ let
     sha256 = "0000000000000000000000000000000000000000000000000000";
   };
   
-  flu-linux = pkgs.buildLinuxKernel {
+  flu-linux = pkgs.buildLinux {
     name = "flu-linux";
     src = myLinuxSrc;
-    config = "./.config"
+    config = "./.config";
     modules = [ ];
   };
 in {
