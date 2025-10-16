@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
+let
+  flu-linux = import ./modules/flu-linux.nix { inherit pkgs; };
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -7,6 +10,9 @@
     ./modules/zsh.nix
     ./modules/emacs.nix
   ];
+
+  # Custom kernel
+  boot.kernelPackages = flu-linux.kernelPackages;
 
   services = {
     xserver.enable = false;
@@ -42,8 +48,15 @@
     brightnessctl
     playerctl
     pavucontrol
-    inputs.ashell.defaultPackage.${pkgs.system}
+    ashell
+    bibata-cursors
   ];
+
+  environment.variables = {
+    NIXOS_OZONE_WL=1;
+    XCURSOR_THEME = "Bibata-Modern-Classic";
+    XCURSOR_SIZE = "24";
+  };
 
   # Home Manager for user-level config files
   home-manager.users.flu = {
