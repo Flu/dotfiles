@@ -26,6 +26,7 @@
 	      catppuccin-theme chronos clang-format+ company-c-headers
 	      company-ghci company-irony company-irony-c-headers
 	      dired-git flycheck flycheck-clang-analyzer haskell-mode
+	      flycheck-rust rust-mode cargo-mode
 	      highlight-indent-guides highlight-indentation irony
 	      irony-eldoc lsp-haskell lsp-mode nix-mode nlinum peep-dired
 	      ultra-scroll magit vertico doom-modeline))
@@ -80,6 +81,7 @@
       select-enable-primary t
       save-interprogram-paste-before-kill t)
 
+(add-to-list 'auto-mode-alist '("\\.pl\\'" . prolog-mode))
 ;; ---------- irony-mode ----------
 ;; Enable irony-mode automatically for C/C++/ObjC
 (require 'irony)

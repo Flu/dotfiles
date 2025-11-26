@@ -42,17 +42,6 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  # Static ip address on eth1
-  # Temporary
-  networking = {
-    interfaces.eth1 = {
-      ipv4.addresses = [{
-        address = "192.168.10.3";
-        prefixLength = 24;
-      }];
-    };
-  };
-
   users.users.flu = {
     isNormalUser = true;
     description = "Adrian Fluturel";
@@ -77,7 +66,9 @@
     nmap
     gcc
     clang
+    gnumake
     tree
+    ascii
   ];
   fonts.packages = with pkgs; [
     noto-fonts
