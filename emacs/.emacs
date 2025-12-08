@@ -29,7 +29,7 @@
 	      flycheck-rust rust-mode cargo-mode
 	      highlight-indent-guides highlight-indentation irony
 	      irony-eldoc lsp-haskell lsp-mode nix-mode nlinum peep-dired
-	      ultra-scroll magit vertico doom-modeline))
+	      ultra-scroll magit vertico doom-modeline latex-extra latex-math-preview latex-preview-pane))
  '(term-buffer-maximum-size 1024))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -212,6 +212,10 @@ With no arg, N defaults to current line."
 ;; ------------ vertico ---------------
 (require 'vertico)
 (vertico-mode 1)
+
+;; ------------- latex ----------------
+(add-hook 'LaTeX-mode-hook #'latex-extra-mode)
+(latex-preview-pane-enable)
 
 (provide '.emacs)
 ;;; .emacs ends here

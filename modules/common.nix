@@ -61,7 +61,14 @@
     btop
     vlc
     alacritty
-    python313
+    (python313.withPackages (ps: with ps; [
+        numpy
+        pandas
+        pip
+        pyelftools
+        scikit-learn
+        ipykernel
+    ]))
     irony-server
     nmap
     gcc
@@ -69,6 +76,8 @@
     gnumake
     tree
     ascii
+    texlive.combined.scheme-full
+    vscode-fhs
   ];
   fonts.packages = with pkgs; [
     noto-fonts
