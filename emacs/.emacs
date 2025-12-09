@@ -29,7 +29,7 @@
 	      flycheck-rust rust-mode cargo-mode
 	      highlight-indent-guides highlight-indentation irony
 	      irony-eldoc lsp-haskell lsp-mode nix-mode nlinum peep-dired
-	      ultra-scroll magit vertico doom-modeline latex-extra latex-math-preview latex-preview-pane))
+	      ultra-scroll magit vertico doom-modeline latex-extra latex-math-preview latex-preview-pane smudge))
  '(term-buffer-maximum-size 1024))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -216,6 +216,11 @@ With no arg, N defaults to current line."
 ;; ------------- latex ----------------
 (add-hook 'LaTeX-mode-hook #'latex-extra-mode)
 (latex-preview-pane-enable)
+
+;; ------------ smudge ---------------
+(setq smudge-oauth2-client-secret "12963ce328034f28aeb3b1f16b716306")
+(setq smudge-oauth2-client-id "1688938caefc4f45b2cdeac4015db5f0")
+(setq smudge-transport 'connect)
 
 (provide '.emacs)
 ;;; .emacs ends here
