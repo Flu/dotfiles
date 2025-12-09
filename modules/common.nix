@@ -81,6 +81,7 @@
     asusctl
     discord
     whatsapp-electron
+    spotify
   ];
 
   fonts.packages = with pkgs; [
