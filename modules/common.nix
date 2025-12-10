@@ -62,13 +62,18 @@
     vlc
     alacritty
     (python313.withPackages (ps: with ps; [
-        numpy
-        pandas
-        pip
-        pyelftools
-        scikit-learn
-        ipykernel
+      python-lsp-server
+      pylsp-mypy
+      python-lsp-black
+      pyls-isort
+      numpy
+      pandas
+      pip
+      pyelftools
+      scikit-learn
+      ipykernel
     ]))
+    pyright
     irony-server
     nmap
     gcc
@@ -78,10 +83,12 @@
     ascii
     texlive.combined.scheme-full
     vscode-fhs
+    jetbrains.idea-community
     asusctl
     discord
     whatsapp-electron
     spotify
+    qbittorrent
   ];
 
   fonts.packages = with pkgs; [
@@ -90,6 +97,9 @@
     noto-fonts-color-emoji
     fira-code
     fira-code-symbols
+    nerd-fonts.symbols-only
+    nerd-fonts.fira-code
+    nerd-fonts.jetbrains-mono
 ];
 
   system.stateVersion = "25.05";

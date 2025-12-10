@@ -28,8 +28,8 @@
 	      dired-git flycheck flycheck-clang-analyzer haskell-mode
 	      flycheck-rust rust-mode cargo-mode
 	      highlight-indent-guides highlight-indentation irony
-	      irony-eldoc lsp-haskell lsp-mode nix-mode nlinum peep-dired
-	      ultra-scroll magit vertico doom-modeline latex-extra latex-math-preview latex-preview-pane smudge))
+	      irony-eldoc lsp-haskell lsp-mode lsp-pyright nix-mode nlinum peep-dired
+	      ultra-scroll magit vertico doom-modeline latex-extra latex-math-preview latex-preview-pane spotify))
  '(term-buffer-maximum-size 1024))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -140,7 +140,7 @@ With no arg, N defaults to current line."
   (setq clang-format-style style)
   (message "clang-format style set to %s" style))
 
-(global-set-key (kbd "C-c s") 'my/clang-format-set-style)
+(global-set-key (kbd "C-c c") 'my/clang-format-set-style)
 (global-set-key (kbd "C-c f") 'clang-format-region)
 
 ; Use tabs or spaces depending on project
@@ -217,10 +217,31 @@ With no arg, N defaults to current line."
 (add-hook 'LaTeX-mode-hook #'latex-extra-mode)
 (latex-preview-pane-enable)
 
-;; ------------ smudge ---------------
-(setq smudge-oauth2-client-secret "12963ce328034f28aeb3b1f16b716306")
-(setq smudge-oauth2-client-id "1688938caefc4f45b2cdeac4015db5f0")
-(setq smudge-transport 'connect)
+;; ------------ spotify ---------------
+(require 'spotify)
+(global-set-key (kbd "C-c s p") 'spotify-playpause)
+(global-set-key (kbd "C-c s n") 'spotify-next)
+(global-set-key (kbd "C-c s b") 'spotify-previous)
+(spotify-enable-song-notifications)
+
+;; --------- Python mode with LSP ---------
+(add-hook 'python-mode-hook #'lsp)
+(add-hook 'python-mode-hook #'flycheck-mode)
+(add-hook 'python-mode-hook #'company-mode)
+
+;; Optional: Configure Python LSP server
+(with-eval-after-load 'lsp-mode
+  (setq lsp-pylsp-plugins-pycodestyle-enabled nil  ; disable if too noisy
+        lsp-pylsp-plugins-mccabe-enabled nil
+        lsp-pylsp-plugins-pyflakes-enabled t
+        lsp-pylsp-plugins-pylint-enabled nil))  ; enable if you want pylint
+
+;; Optional: Better Python indentation detection
+(setq python-indent-guess-indent-offset t
+      python-indent-guess-indent-offset-verbose nil)
+
+;; Optional: Use pyright instead
+(setq lsp-pyright-python-executable-cmd "python3")
 
 (provide '.emacs)
 ;;; .emacs ends here
