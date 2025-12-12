@@ -72,7 +72,12 @@
       pyelftools
       scikit-learn
       ipykernel
+      pytesseract
+      pillow
+      thefuzz
+      z3-solver
     ]))
+    tesseract
     pyright
     irony-server
     nmap
@@ -84,11 +89,11 @@
     texlive.combined.scheme-full
     vscode-fhs
     jetbrains.idea-community
-    asusctl
     discord
     whatsapp-electron
     spotify
     qbittorrent
+    gnupg
   ];
 
   fonts.packages = with pkgs; [

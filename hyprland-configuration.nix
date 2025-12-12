@@ -6,6 +6,7 @@
     ./modules/common.nix
     ./modules/zsh.nix
     ./modules/emacs.nix
+    ./modules/asus.nix
   ];
 
   services = {
