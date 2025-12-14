@@ -118,7 +118,7 @@ With no arg, N defaults to current line."
 (require 'clang-format)
 (add-hook 'c-mode-common-hook #'clang-format+-mode)
 (defun my/clang-format-set-style (style)
-  (interactive "sStyle: ")
+  (interactive "Style: ")
   (setq clang-format-style style)
   (message "clang-format style set to %s" style))
 
@@ -131,13 +131,6 @@ With no arg, N defaults to current line."
   (setq indent-tabs-mode t
         c-basic-offset 8
         tab-width 8))
-
-(defun my/personal-style ()
-  (interactive)
-  (setq indent-tabs-mode nil
-        c-basic-offset 4
-        tab-width 4))
-(global-set-key (kbd "C-c a d r i a n") 'zone-sl)
 
 ;; ---------- line numbers -----------
 (global-display-line-numbers-mode)
@@ -158,23 +151,20 @@ With no arg, N defaults to current line."
 (setq c-default-style "linux")
 
 ;; --------- haskell mode -------------
-;; --- Haskell setup ---
 (require 'haskell-mode)
 (require 'lsp-mode)
 (require 'lsp-haskell)
 (require 'company)
 (require 'flycheck)
 
-;; Ensure ghcup binaries are on PATH
-(let ((ghcup-path (expand-file-name "~/.ghcup/bin")))
-  (setenv "PATH" (concat ghcup-path ":" (getenv "PATH")))
-  (add-to-list 'exec-path ghcup-path))
+(setq lsp-haskell-server-path "haskell-language-server-wrapper")
 
-(setq lsp-haskell-server-path "/home/flu/.ghcup/hls/2.10.0.0/lib/haskell-language-server-2.10.0.0/bin/haskell-language-server-wrapper")
 (add-hook 'haskell-mode-hook #'flycheck-mode)
 (add-hook 'haskell-mode-hook #'company-mode)
-(add-hook 'haskell-mode-hook #'lsp)        ;; enable LSP + HLS
+(add-hook 'haskell-mode-hook #'lsp)
+
 (add-hook 'haskell-literate-mode-hook #'lsp)
+(setq lsp-diagnostics-provider :flycheck)
 
 (setq company-idle-delay 0.1
       company-minimum-prefix-length 1
@@ -310,6 +300,18 @@ function that runs a local httpd for code -> token exchange."
 
 ;; ------------- pdftools ----------------
 (pdf-tools-install)
+
+;; ----------- eletric-mode --------------
+(electric-pair-mode)
+
+;; --------- OCaml mode with LSP ---------
+(require 'tuareg)
+(add-hook 'tuareg-mode-hook #'lsp)
+(add-hook 'tuareg-mode-hook #'flycheck-mode)
+(add-hook 'tuareg-mode-hook #'company-mode)
+
+;; Also for interface files
+(add-hook 'tuareg-mode-hook #'lsp)
 
 (provide '.emacs)
 ;;; .emacs ends here

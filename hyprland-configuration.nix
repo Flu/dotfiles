@@ -7,6 +7,8 @@
     ./modules/zsh.nix
     ./modules/emacs.nix
     ./modules/asus.nix
+    ./modules/haskell.nix
+    ./modules/ocaml.nix
   ];
 
   services = {

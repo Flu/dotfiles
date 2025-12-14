@@ -38,6 +38,9 @@
         
         # Haskell extras
         company-ghci
+
+        # Ocaml extras
+        tuareg
         
         # Utilities
         chronos
