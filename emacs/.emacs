@@ -313,5 +313,10 @@ function that runs a local httpd for code -> token exchange."
 ;; Also for interface files
 (add-hook 'tuareg-mode-hook #'lsp)
 
+;; ------------- move-text ---------------
+(require 'move-text)
+(global-set-key (kbd "M-<up> ") 'move-text-up)
+(global-set-key (kbd "M-<down>") 'move-text-down)
+
 (provide '.emacs)
 ;;; .emacs ends here

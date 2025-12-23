@@ -94,7 +94,13 @@
     spotify
     qbittorrent
     gnupg
+    gmp
+    pkg-config
   ];
+
+  home-manager.users.flu.home.sessionVariables = {
+      PKG_CONFIG_PATH = "${pkgs.gmp.dev}/lib/pkgconfig";
+  };
 
   fonts.packages = with pkgs; [
     noto-fonts

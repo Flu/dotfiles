@@ -15,6 +15,7 @@
         company
         vertico
         magit
+        move-text
         
         # Language support
         flycheck
@@ -26,6 +27,7 @@
         rust-mode
         cargo-mode
         flycheck-rust
+        yaml-mode
         
         # C/C++ support
         irony
