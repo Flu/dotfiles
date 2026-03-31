@@ -51,12 +51,20 @@
   # Install firefox.
   programs.firefox.enable = true;
 
+  # Other services
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true; # optional but very helpful GUI
   services.openssh.enable = true;
 
+  # KDE connect
+  programs.kdeconnect.enable = true;
+  
   environment.systemPackages = with pkgs; [
+    rnnoise-plugin
     fastfetch
     wget
     curl
+    pciutils
     git
     btop
     vlc
@@ -71,11 +79,15 @@
       pip
       pyelftools
       scikit-learn
+      matplotlib
+      requests
       ipykernel
       pytesseract
       pillow
       thefuzz
       z3-solver
+      textual
+      osmnx
     ]))
     tesseract
     pyright
@@ -88,18 +100,40 @@
     ascii
     texlive.combined.scheme-full
     vscode-fhs
-    jetbrains.idea-community
+    jetbrains.idea
     discord
     whatsapp-electron
     spotify
     qbittorrent
     gnupg
     gmp
+    gimp
     pkg-config
+    libreoffice
+    syncplay
+    steam
+    dotnet-runtime_10
+    ckan
+    ollama-vulkan
   ];
 
+  programs.steam.enable = true;
+
+  services.ollama = {
+    enable = true;
+    package = pkgs.ollama-vulkan;
+    
+    environmentVariables = {
+      # Replace "1" with the ID you found in vulkaninfo if it's different
+      GGML_VK_VISIBLE_DEVICES = "1"; 
+      # This ensures Vulkan is actually being requested as the runner
+      OLLAMA_VULKAN = "1";
+    };
+  };
+  
   home-manager.users.flu.home.sessionVariables = {
-      PKG_CONFIG_PATH = "${pkgs.gmp.dev}/lib/pkgconfig";
+    PKG_CONFIG_PATH = "${pkgs.gmp.dev}/lib/pkgconfig";
+    LD_LIBRARY_PATH = "";
   };
 
   fonts.packages = with pkgs; [
@@ -111,7 +145,7 @@
     nerd-fonts.symbols-only
     nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
-];
+  ];
 
   system.stateVersion = "25.05";
 }

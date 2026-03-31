@@ -4,7 +4,6 @@
   # Enable asusd service
   services.asusd = {
     enable = true;
-    enableUserService = true;
   };
 
   environment.systemPackages = with pkgs; [

@@ -11,7 +11,7 @@
       syntaxHighlighting.enable = true;
       autocd = true;
       autosuggestion.enable = true;
-      history.size = 10000;
+      history.size = 1000000;
 
       shellAliases = {
         ls = "ls -l";

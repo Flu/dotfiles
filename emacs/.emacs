@@ -174,7 +174,7 @@ With no arg, N defaults to current line."
 (setq haskell-font-lock-symbols t)
 
 ;; Optional: use TAB for completion if you like manual triggers
-(define-key haskell-mode-map (kbd "TAB") #'company-complete)
+;; (define-key haskell-mode-map (kbd "TAB") #'company-complete)
 
 ;; ---------- dired-git ----------------
 (add-hook 'dired-mode-hook 'dired-git-mode)
@@ -189,95 +189,6 @@ With no arg, N defaults to current line."
 ;; ------------- latex ----------------
 (add-hook 'LaTeX-mode-hook #'latex-extra-mode)
 (latex-preview-pane-enable)
-
-;; ------------ spotify ---------------
-(require 'smudge)
-(setq plstore-cache-passphrase-for-symmetric-encryption t)
-(setq plstore-encrypt-to nil)
- 
-(setq smudge-oauth2-client-secret "")
-(setq smudge-oauth2-client-id "")
-(define-key smudge-mode-map (kbd "C-c s ") 'smudge-command-map)
-
-(defun smudge-api-oauth2-auth-fixed (auth-url token-url client-id client-secret &optional scope state redirect-uri)
-  "Authenticate application via OAuth2.
-Send CLIENT-ID and CLIENT-SECRET to AUTH-URL.  Get code and send to TOKEN-URL.
-Replaces functionality from built-in OAuth lib to call smudge-specific
-function that runs a local httpd for code -> token exchange."
-  (let ((inhibit-message t))
-    (oauth2-request-access
-     auth-url
-     token-url
-     client-id
-     client-secret
-     (smudge-api-oauth2-request-authorization
-      auth-url client-id scope state redirect-uri)
-     redirect-uri)))
-
-(advice-add 'smudge-api-oauth2-auth :override #'smudge-api-oauth2-auth-fixed)
-
-;; Fix token refresh to avoid GPG/plstore issues
-(defun my-smudge-api-retrieve-oauth2-token ()
-  "Retrieve OAuth2 token without using oauth2.el's broken plstore."
-  (let ((now (string-to-number (format-time-string "%s"))))
-    (if (null (or smudge-api-oauth2-token (smudge-api-deserialize-token)))
-        ;; No token at all - do full OAuth flow
-        (if smudge-is-authorizing
-            (progn
-              (while (not smudge-api-oauth2-token)
-                (message "Waiting for authorization...")
-                (sleep-for 1))
-              smudge-api-oauth2-token)
-          (setq smudge-is-authorizing t)
-
-          (let ((token (smudge-api-oauth2-auth smudge-api-oauth2-auth-url
-                                               smudge-api-oauth2-token-url
-                                               smudge-oauth2-client-id
-                                               smudge-oauth2-client-secret
-                                               smudge-api-oauth2-scopes
-                                               nil
-                                               (smudge-api-oauth2-callback))))
-            (setq smudge-is-authorizing nil)
-            (smudge-api-persist-token token now)
-            (if (null token)
-                (user-error "OAuth2 authentication failed")
-              token)))
-      ;; Token exists but might be expired - refresh it
-      (if (> now (+ smudge-api-oauth2-ts 3000))
-          ;; Manual token refresh instead of using oauth2-refresh-access
-          (let* ((refresh-token (oauth2-token-refresh-token smudge-api-oauth2-token))
-                 (url-request-method "POST")
-                 (url-request-extra-headers
-                  `(("Content-Type" . "application/x-www-form-urlencoded")))
-                 (url-request-data
-                  (concat "grant_type=refresh_token"
-                          "&refresh_token=" (url-hexify-string refresh-token)
-                          "&client_id=" (url-hexify-string smudge-oauth2-client-id)
-                          "&client_secret=" (url-hexify-string smudge-oauth2-client-secret))))
-            (with-current-buffer
-                (url-retrieve-synchronously smudge-api-oauth2-token-url t)
-              (goto-char (point-min))
-              (re-search-forward "^$")
-              (let* ((json-object-type 'plist)
-                     (response (json-read))
-                     (access-token (plist-get response :access_token))
-                     (new-refresh-token (or (plist-get response :refresh_token) refresh-token))
-                     (expires-in (plist-get response :expires_in))
-                     (new-token (make-oauth2-token
-                                :client-id smudge-oauth2-client-id
-                                :client-secret smudge-oauth2-client-secret
-                                :access-token access-token
-                                :refresh-token new-refresh-token
-                                :token-url smudge-api-oauth2-token-url
-                                :access-response response)))
-                (smudge-api-persist-token new-token now)
-                new-token)))
-        smudge-api-oauth2-token))))
-
-(advice-add 'smudge-api-retrieve-oauth2-token :override #'my-smudge-api-retrieve-oauth2-token)
-
-(setq smudge-transport 'connect)
-(global-smudge-remote-mode)
 
 ;; --------- Python mode with LSP ---------
 (add-hook 'python-mode-hook #'lsp)
