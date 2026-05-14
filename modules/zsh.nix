@@ -24,8 +24,8 @@
 
       oh-my-zsh = {
         enable = true;
-        custom = "$HOME/.oh-my-zsh/custom/";
-        theme = "lambda_adrian";
+        custom = "/home/flu/.oh-my-zsh/custom/";
+        theme = "lambdonathan";
         plugins = [ "git" ];
       };
     };

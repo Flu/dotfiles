@@ -1,5 +1,14 @@
-{ config, pkgs, ... }:
-{
+{ config, pkgs, lib, ... }:
+let
+  libunwindLinked = pkgs.symlinkJoin {
+    name = "libunwind-links";
+    paths = [ pkgs.libunwind ];
+    postBuild = ''
+      mkdir -p $out/lib
+      ln -s ${pkgs.libunwind}/lib/libunwind.so $out/lib/libunwind.so.1
+    '';
+  };
+in {
   imports = [];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -37,11 +46,16 @@
     variant = "";
   };
 
+  xdg.portal = {
+    enable = true;
+  };
+  
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
   nixpkgs.config.allowUnfree = true;
-
+  nix.settings.download-buffer-size = 512 * 1024 * 1024;
+  
   users.users.flu = {
     isNormalUser = true;
     description = "Adrian Fluturel";
@@ -58,6 +72,11 @@
 
   # KDE connect
   programs.kdeconnect.enable = true;
+
+  # Fix for using Principia mod in KSP
+  environment.variables = {
+    LD_LIBRARY_PATH = "/nix/store/mrsbbybinn24fpkz1zp401dyb16pwpx6-libcxx-21.1.2/lib:/nix/store/g40raprphg2a4m5zb7823rdgxyv6685n-libunwind-links/lib:$LD_LIBRARY_PATH";
+  };
   
   environment.systemPackages = with pkgs; [
     rnnoise-plugin
@@ -88,6 +107,7 @@
       z3-solver
       textual
       osmnx
+      (callPackage ./krpc.nix { })
     ]))
     tesseract
     pyright
@@ -115,6 +135,10 @@
     dotnet-runtime_10
     ckan
     ollama-vulkan
+    proton-vpn
+
+    # For use with Principia mod for KSP
+    libcxx libcxxrt libunwindLinked
   ];
 
   programs.steam.enable = true;
